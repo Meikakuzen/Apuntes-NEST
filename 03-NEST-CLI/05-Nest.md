@@ -1,5 +1,7 @@
 # NEST 05
+
 - Voy a trabajar con las marcas para que tengan un id propio y un nombre
+
 ## NEST Cli Resource - Brands
 ------
 - La idea es ahora tener el endpoint de brands con todo el CRUD
@@ -7,7 +9,9 @@
 > http://localhost:3000/brands
 
 Para ello en NEST existe el comando:
+
 > nest g res <nombre>
+
 - Selecciono RESTAPI y que SI haga los entry points
 - Crea el módulo, los servicios, todo
 - Crea también una carpeta de entyties. 
@@ -15,18 +19,22 @@ Para ello en NEST existe el comando:
     - Es similar a una interface que me dice cómo van a lucir mis brands
 - El dto update-brands es una extensión de create-brand.
     - El PartialType(CreateBrandDto) hace que todas las propiedades del dto del que lo estoy expandiendo sean opcionales
+  
 ~~~ts
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateBrandDto } from './create-brand.dto';
 
 export class UpdateBrandDto extends PartialType(CreateBrandDto) {}
 ~~~ 
+
 - Falta implementar la lógica de los servicios y los dtos
+
 ------
 # CRUD Completo - Brands
 ------
 - Empiezo con entities. Cómo quiero que mi información quede grabada en la base de datos
 - Pongo como opcionales la fecha de creación y la fecha de update
+
 ~~~ts
 export class Brand {
     
@@ -37,11 +45,13 @@ export class Brand {
     updatedAt?: number
 }
 ~~~
+
 - No se le pone de nombre BrandEntity porque así se llamaría luego la DB y no quiero eso
 - Voy a los servicios (brand.service)
 - Creo una propiedad privada de tipo Brand ( de la entity ), será un arreglo
 - Le agrego un brand por defecto
 - Cambio el id de number a string porque así lo maneja uuid( hago la importación de la versión 4)
+
 ~~~ts
 import { Injectable } from '@nestjs/common';
 import { IsUUID } from 'class-validator';
@@ -101,34 +111,46 @@ export class CreateBrandDto {
     name: string
 }
 ~~~
+
 - Voy al método create del brands.services
 - Pongo brand de tipo Brand, pero contra una base de datos será una nueva instancia de Brand
-~~~js
+
+~~~ts
   create(createBrandDto: CreateBrandDto) {
-    const brand: Brand ={
+   
+   const brand: Brand ={
       id: uuid(),
-      name: createBrandDto.name.toLocaleLowerCase(),
+      name: createBrandDto.name.toLowerCase(),
       createdAt: new Date().getTime()
     }
+
     this.brands.push( brand)
     return brand
   }
 ~~~
+
 - Voy al update. Para ello voy al dto update-brand. La única parte que cambia es el name
 - Renombro la clase ( le quito el PartialType, se usará más adelante ) y copio lo mismo que hay en create-brand.dto
-~~~js
+
+~~~ts
 export class UpdateBrandDto{
+
     @IsString()
     @MinLength(1)
     name: string
 }
 ~~~
+
 - Como no estoy trabajando con una base de datos, el update es el mismo trabajo que con cars
-~~~js
+
+~~~ts
  update(id: string, updateBrandDto: UpdateBrandDto) {
+    
     let brandDB = this.findOne(id)
+    
     this.brands = this.brands.map(brand=>{
-      if(brand.id===id){
+    
+    if(brand.id===id){
         brandDB.updatedAt= new Date().getTime()
         brandDB={
           ...brandDB, ...updateBrandDto
@@ -139,14 +161,20 @@ export class UpdateBrandDto{
     })
   }
 ~~~
-- Ahora falta del Delete. Recuerda: el id es una string, hay que cambiarlo en el controller también
+
+- Ahora falta el Delete. Recuerda: el id es una string, hay que cambiarlo en el controller también
+
 ~~~js
+
   remove(id: string) {
     this.brands = this.brands.filter( brand=> brand.id !== id)
+    
     return 
   }
 ~~~
+
 - El controller luce así ( con el PIpeUUIDPipe incluido)
+
 ~~~js
 import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe } from '@nestjs/common';
 import { BrandsService } from './brands.service';
