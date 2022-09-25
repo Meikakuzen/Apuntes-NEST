@@ -3,11 +3,13 @@
 ## Entidad de usuarios
 -----
 - Necesito la tabla de usuarios: quien creó el producto, que id tiene el usuario, etc
+- Creo el resource de auth
 
 > nest g res auth --no-spec
 
 - El objetivo de las entidades es tener una relación entre las tablas de la DB y la aplicación
 - Una entidad y una tabla es una relación de 1:1, 1 entidad = 1 tabla
+- Creo en la entity de auth User
 
 ~~~ts
 import { IsArray, IsBoolean, IsString } from "class-validator";
@@ -45,7 +47,7 @@ export class User {
 ~~~
 
 - Para decirle a NEST que está esta entidad y crear la tabla debo ir al auth.module.
-- Es un módulo, por lo que va en los imports el TypeOrmModule.forFeature(User)
+- Es un módulo, por lo que va en los imports en el TypeOrmModule.forFeature(User)
 - Para que User pueda usarse fuera del módulo hay que exportar el TypeOrmModule
 
 ~~~ts
@@ -338,7 +340,7 @@ export class LoginUserDto{
   }
 ~~~
 
-- Ahora si hago una petición Post al endpoint y en el body un JSON con el mail y el password, me responde el mail y el password hasheado
+- Ahora si hago una petición Post al endpoint y en el body un JSON con el mail y el password, me responde el mail con el password hasheado
 
 > http://localhost:3000/api/auth/login
 
@@ -490,11 +492,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 export class AuthModule {}
 ~~~
 
-- Falta todavía saber qué información grabo en el JWT, cómo validarlo, ni a qué usuario le corresponde ese JWT
+- Falta todavía saber qué información grabo en el JWT, cómo validarlo, y a qué usuario le corresponde ese JWT
 
 ## JWTStrategy
 ---
-- Con el payload del JWT, lo que quiero hacer es saber que usuario es y tener la info a través del mail, si el user esta activo y que roles tiene
+- Con el payload del JWT, lo que quiero hacer es saber que usuario es y tener la info a través del email, si el user esta activo y que roles tiene
 - Si no está activo no va a poder autenticarse
 - Creo una carpeta dentro de /auth llamada strategies, y dentro un archivo que se llama jwt.strategy.ts
 - Necesito dos importaciones:
@@ -1140,7 +1142,9 @@ export const GetUser= createParamDecorator(
         return user
 })
 ~~~
+
 - en el controller
+
 ~~~ts
   @Get('private')
   @UseGuards(AuthGuard())
@@ -1286,7 +1290,7 @@ export const RawHeaders = createParamDecorator(
   }
 ~~~
 
-- La idea es crear un decorador que sirva para que este Get necesite tenr ciertos roles. Un decorador que me ayude a validar si tengo esos roles
+- La idea es crear un decorador que sirva para que este Get necesite tener ciertos roles. Un decorador que me ayude a validar si tengo esos roles
 - Puedo usar @SetMetadata(), sirve para añadir información extra al controlador
 
 ~~~ts
@@ -1670,7 +1674,7 @@ export class SeedController {
 ## Auth en otros módulos
 ----
 - AuthGuard está conectado a @nestjs/passport, y passport es un módulo.
-- hay que exportar ese Auth. Es el defaultStrategy lo que está demandando.
+- Hay que exportar ese Auth. Es el defaultStrategy lo que está demandando.
 - Ya lo exporté en su momento, es lo que necesito para usar todo lo relacionado a passport del módulo auth
 - Lo importo en seed.module
 
@@ -1742,7 +1746,7 @@ export class SeedModule {}
     user: User
 ~~~
 
-- Si ahora voy a tablePlus, en la parte de los proiductos hay una nueva columna llamada userId
+- Si ahora voy a tablePlus, en la parte de los productos, hay una nueva columna llamada userId
 - TypeORM lo hizo por mi
 - Para que pueda ver en la petición qué usuario cargó ese producto pongo el egaer en true
 
@@ -2069,6 +2073,7 @@ async  runSeed() {
 }
 
 ~~~
+
 - Quito el @Auth() del seed.controller para realizar el seed
 - petición Get
 

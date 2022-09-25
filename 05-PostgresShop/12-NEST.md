@@ -55,7 +55,7 @@ export class ProductsModule {}
 - A producto voy a tener que decirle que tiene imágenes, y a imágenes habrá que decirle que tienen la id de un producto
 - Tengo que decirle al @OneToMany cómo se va a conectar
 - El productImage.product no existe todavía.
-- El cascade: true me va a ayudar, por ejemplo en la eliminación de un producto, va a eliminar las imágenes que estén asociadas al producto
+- El cascade: true me va a ayudar, por ejemplo, en la eliminación de un producto, va a eliminar las imágenes que estén asociadas al producto
 - Hay que definir que será un arreglo
 
 ~~~ts
@@ -172,7 +172,7 @@ export class ProductImage{
 
 > localhost:3000/api/products
 
-- ene l body de la petición
+- En el body de la petición
 
 ~~~json
 {
@@ -238,7 +238,8 @@ export class CreateProductDto {
 
 - Esto da un error en la terminal. Dice:  
 -Types of property 'images' are incompatible.
-      Type 'string[]' is not assignable to type 'DeepPartial<ProductImage>'.
+
+> Type 'string[]' is not assignable to type 'DeepPartial<ProductImage>'.
 ~~~ts
  const product = await this.productRepository.preload({
                                                             ~
@@ -248,7 +249,7 @@ export class CreateProductDto {
    ~~~~~~~~~~~~~~~~~~~~~~~~~
 71     })
    ~~~~~
-   ~~~
+~~~
 
 - Parece que el error está en el update-products.dto
 - Vayamos al product.service
@@ -473,9 +474,11 @@ async create(createProductDto: CreateProductDto) {
     
   }
 ~~~
+
 - Esto así funciona, pero yo quiero aplanar las imagenes
 - Yo se que el find va a regresar una colección de producto
 - Puedo hacer esto:
+
 ~~~ts
   async findAll(paginationDto: PaginationDto) {
     
@@ -495,8 +498,9 @@ async create(createProductDto: CreateProductDto) {
     }))
   }
 ~~~
+
 - Ahora recibo solo las url en la respuesta
-- En el findOne tengo el mismo problema con las imagenes, no las retorna. Pero tal y como está configurado no puedo usar el relations
+- En el findOne tengo el mismo problema con las imágenes, no las retorna. Pero tal y como está configurado no puedo usar el relations
 - En la documentación es Eager Relations:
     - eager relations are loaded automatically each time you load entities from the db
 - Cualquier find va a funcionar
@@ -587,7 +591,6 @@ export class Product {
 }
 ~~~
 
-
 - Si busco por el slug no aparecen las imagenes
 - Si me fijo, en findOne estoy usando el QueryBuilder. Hay que usar leftJoinAndSelect y especificar la relación
     - Hay que especificar cómo se van a  relacionar. La tabla
@@ -676,18 +679,18 @@ export class Product {
 ~~~
 
 - Puedo borrar todas las imágenes, ya que está establecida la relación muchos a uno
-- Si intento borrar un producto que tiene imágenes va a rebentar porque hay un CONSTRAIN ahi puesto
+- Si intento borrar un producto que tiene imágenes va a reventar porque hay un CONSTRAIN ahi puesto
 - Hay que corregir estos problemas
 - Si quiero agregar urls de imágenes desde el PATCH no las agrega. Lo que quiero es agregarlas y borrar todas las anteriores
 - Son dos transacciones: la de eliminación que tiene que salir bien, y la de actualización.
 - Si una de las dos falla debo poder hacer la inversión de la transacción y mandarle un mensaje al usuario indicándole qué sucedió
-- El **QueryRunner** me va a permitir ejecutar X cantidad de instrucciones SQL y decirle "si todo sale bien, impacta la base de datos. Pero si no, puedo havcer el roll back y revertirlo todo"
+- El **QueryRunner** me va a permitir ejecutar X cantidad de instrucciones SQL y decirle "si todo sale bien, impacta la base de datos. Pero si no, puedo hacer el roll back y revertirlo todo"
 - Todo va a empezar con el preload del producto
 - Desestructuro las imágenes y el resto con el parámetro REST
 - El queryRunnner es un objeto que entre otras cosas tiene que conocer la cadena de conexión con la base de datos
 - Para ello debo inyectar el DataSource, lo importo del ORM
 - Al inyectarlo de esta manera sabe cual es la cadena de conexión, sabe el usuario, tiene la misma configuración que mi repositorio
-- Usaré ese DataSource para
+- Usaré ese DataSource para crear el queryRunner
 
 ~~~ts
 import { BadRequestException, Inject, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
@@ -836,10 +839,10 @@ export class ProductsService {
 
 ## Transacciones
 -----
-- Entiendase transacción cómo una serie de QUERYS que pueden impactar la DB
+- Entiéndase transacción cómo una serie de QUERYS que pueden impactar la DB
 - Pueden insertar, eliminar, etc
 - Debo decir: quiero hacer el commit de esa transacción, que puede implicar un montón de querys
-- Debo asegurarme del commit o el ROLL BACK, y también liberar el queryRunner porque si no hace una de esas dos mantiene la conexión
+- Debo asegurarme del commit o el ROLL BACK, y también liberar el queryRunner porque si no se hace una de esas dos mantiene la conexión
 - Le indico que conecte el queryRunner y que empiece la transacción
 - product.service:
 
@@ -922,7 +925,6 @@ export class ProductsService {
       
     }
   }
-
 ~~~
 
 - Falta hacer el commit, decirle a la transacción si no has dado error hasta este punto, guarda los cambios
@@ -1045,12 +1047,13 @@ async update(id: string, updateProductDto: UpdateProductDto) {
 
 ## Eliminación en cascada
 -----
-- Si intento borrar un producto que tiene imagen/es me da error 500
+- Si intento borrar un producto que tiene imagenes me da error 500
 
 > Update or delete on table "product" violates foreign key constraint "OIUJonuo8by7098B?)" on table "poduct_image"
+
 - Se podría solucionar iniciando una transacción, borrar primero las imágenes y luego borrar el producto
 - También puedo decirle que cuando borre un producto se borren las imagenes relacionadas en cascada
-- En la entity no he especificado que quiero que suceda cuando se borren las imñagenes
+- En la entity no he especificado que quiero que suceda cuando se borren las imágenes
 - product-image.entity:
 
 ~~~ts
@@ -1286,7 +1289,7 @@ async  runSeed() {
 - this.productsService.create(product) es una promesa ( si dejas el cursor encima lo dice )
 - La inserto en el arreglo de insertPromises
 - Promise.all es de javascript
-- esto está diciendo: espera a que todas estas promesas se resuelvan y cuando se resuelvan sigue con la siguiente línea
+- Esto está diciendo: espera a que todas estas promesas se resuelvan y cuando se resuelvan sigue con la siguiente línea
 
 ~~~ts
 import { Injectable } from '@nestjs/common';

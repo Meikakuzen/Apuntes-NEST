@@ -10,7 +10,7 @@
 
 # Docker Instalar y correr Postgres
 
-- Podría instalar postgres en mi máquina, pero conviene usar docker para mantener esa imagen ( y si vieniera otro desarrollador todo es más fácil )
+- Podría instalar postgres en mi máquina, pero conviene usar docker para mantener esa imagen ( y si viniera otro desarrollador todo es más fácil )
 - Debe de estar Docker corriendo
 - Creo el archivo en la raíz llamado docker-compose.yaml
 - Es recomendado trabajar con versiones de DB especificas porque de haber muchos cambios se minimizan errores o la obligación de migrar
@@ -75,7 +75,7 @@ export class AppModule {}
 
 - En el app.module, en imports configuro la conexión
 - En host coloco la variable de entorno DB_HOST=localhost, DB_PORT=5432
-  - Como el port tiene que ser un numero, fácilmente lo puedo convertir con u + 
+  - Como el port tiene que ser un numero, fácilmente lo puedo convertir con un + 
 - El nombre de la base de datos, y el usuario por defecto que es postgres
 - El synchronize, si hay algun cambio las entidades automaticamente las sincroniza. No se usa en producción
 
@@ -150,7 +150,7 @@ export class Product {
 ~~~
 
 - En algún lugar del módulo tiene que estar definida la entity para que el TypeOrm le pueda decir a la base de datos que hay una nueva entidad
-- Además definimos el autoLoadEntities en true y el synchronize, con lo que le estoy diciendo que lo sincronice
+- Además defino el autoLoadEntities en true y el synchronize, con lo que le estoy diciendo que lo sincronice
 - Voy a products.module y en el imports defino todas las entidades. No es un forRoot porque solo hay uno, es un forFeature
 - Entre corchetes importo la entidad
 
@@ -180,6 +180,7 @@ export class ProductsModule {}
 - No es de tipo number, porque postgres no soporta este tipado. En la ayuda aparecen todos los tipos de mongo, sql,etc
   - En el caso de postgres es numeric. le puedo establecer un valor por defecto
 - Muestro dos formas de declarar el tipo de dato
+
 ~~~ts
 import { ParseUUIDPipe } from "@nestjs/common";
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
@@ -464,7 +465,6 @@ export class ProductsService {
   }
 
 }
-
 ~~~
 
 - Ahora si vuelvo a enviar el mismo body aparece el error de key duplicated en el LOG, luce de otra manera
@@ -694,7 +694,7 @@ export class PaginationDto{
 > http://localhost:3000/api/products?limit=12
 
 - Me dice que limit must be a positive number. Está llegando como string
-- Para hacer la transfromación puedo usar un decorador Type en el dto
+- Para hacer la transformación puedo usar un decorador Type en el dto
 
 ~~~ts
 import { IsNumber, IsOptional, IsPositive } from "class-validator";
@@ -851,31 +851,8 @@ export class ProductsService {
 
 ## QueryBuilder
 ----
-~~~ts
- async findOne(term: string) {
-    
-    let product: Product; 
-
-    if( isUUID(term)){
-      await this.productRepository.findOneBy({id: term})
-
-    }else{
-      const queryBuilder= this.productRepository.createQueryBuilder()
-      product = await queryBuilder.where('title=:title or slug =:slug',{
-        title:term,
-        slug: term
-      }).getOne()
-    }
-
-
-     if(!product) throw new NotFoundException('Product not found!')
-
-    return product
-  }
-~~~
-
 - El problema es que el título no lo estamos parseando a todo minúsculas ( o mayúsculas ) y eso puede llevar a error de case sensitive
-- Paso el título ( la definición de la columna ) a mayúsculas con UPPER. Esto me escapa los espacios y apóstrofes también
+- Paso el título ( la definición de la columna ) entre paréntesis a mayúsculas con UPPER. Esto me escapa los espacios y apóstrofes también
 - El slug siempre lo he trabajado en minúsculas
 
 ~~~ts
@@ -959,7 +936,7 @@ export class UpdateProductDto extends PartialType(CreateProductDto) {}
 
 - Si le cambio el titulo y el titulo ya existe voy a tener un error 500
 - Puedo manejar el error cómo lo hice anteriormente con el handleDBExceptions
-- Meto el save e un try catch
+- Meto el save en un try catch
 - En el error uso el método que creé 
 
 ~~~ts

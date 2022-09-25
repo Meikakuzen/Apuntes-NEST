@@ -69,7 +69,7 @@ export class FilesController {
 - Este archivo por defecto se sube a una carpeta temporal. Cuando no se use node lo limpiará por si solo
 - Debo decirle que hacer con este archivo
 - No es recomendable guardar el archivo en fileSystem por motivos de seguridad
-- En n servidor interno pequeño no habría problema, pero si va a exponerse a internet es recomendable un servicio de terceros
+- En un servidor interno pequeño no habría problema, pero si va a exponerse a internet es recomendable un servicio de terceros
 
 ## Validar Archivos
 ----
@@ -78,10 +78,9 @@ export class FilesController {
 - Creo una carpeta llamada helpers. La idea es tener funciones que específicamente trabajen en este módulo
 - Creo el archivo fileFilter.helper.ts con la función de flecha fileFilter
 - Esta función tiene que lucir para poder usarlo en el FileInterceptor
-- Si escribo una coma dentro del FileInterceptor, después del primer argumento, abro llaves,pongo el fileFilter y coloco el cursor encima, veo lo que me está pidiendo para que funcione
+- Si escribo una coma dentro del FileInterceptor, después del primer argumento, abro llaves, pongo el fileFilter y coloco el cursor encima, veo lo que me está pidiendo para que funcione
 
 ~~~ts
-
   @Post('product')
   @UseInterceptors( FileInterceptor('file', {fileFilter}) ) //coloca el cursor encima
   uploadProductImage(
@@ -131,6 +130,7 @@ export class FilesController {
   }
 }
 ~~~
+
 - El console.log del fileFilter me devuelve en consola lo siguiente
 
 ~~~json
@@ -165,6 +165,7 @@ callback(null, false)
 
 - Esto no va a lanzar el error de la excepción
 - controller
+
 ~~~ts
 @Controller('files')
 export class FilesController {
@@ -464,7 +465,7 @@ export class FilesController {
 
 > HOST_API=http://localhost:3000/api
 
-- Necesito esa variable de entorno. Para ello voya inyectar en el controller el ConfigService
+- Necesito esa variable de entorno. Para ello voy a inyectar en el controller el ConfigService
 
 ~~~ts
 import { BadRequestException, Controller, Get, Param, Post, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
